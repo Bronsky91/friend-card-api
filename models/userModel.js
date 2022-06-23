@@ -12,7 +12,11 @@ const userModel = mongoose.Schema({
     {
       title: String,
       address: String,
-      //   location: {},
+      location: {
+        address: String,
+        latitude: Number,
+        longitude: Number,
+      },
       description: String,
       date: String,
       slots: Number,
