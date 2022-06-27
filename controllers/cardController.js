@@ -11,7 +11,7 @@ exports.index = async (req, res) => {
     const [bearer, token] = req.headers.authorization.split(" ");
     const tokenData = jwt.verify(token, jwtSecret);
 
-    const user = await User.findById(tokenData._id);
+    const user = await User.findById(tokenData.id);
 
     res.json({ cards: user.cards });
   } catch (error) {
@@ -34,7 +34,7 @@ exports.add = async (req, res) => {
     }
     const tokenData = jwt.verify(token, jwtSecret);
 
-    const user = await User.findById(tokenData._id);
+    const user = await User.findById(tokenData.id);
 
     const newCardId = new mongoose.Types.ObjectId();
 
@@ -53,10 +53,38 @@ exports.add = async (req, res) => {
   }
 };
 
-exports.webCard = async (req, res) => {
-  // TODO: Get card data using userId and cardId
+exports.getShareToken = async (req, res) => {
   try {
-    const { userId, cardId } = req.query;
+    const [bearer, token] = req.headers.authorization.split(" ");
+    const tokenData = jwt.verify(token, jwtSecret);
+
+    const { cardId } = req.body;
+
+    const user = await User.findById(tokenData.id);
+
+    const shareToken = jwt.sign(
+      {
+        userId: user._id,
+        cardId,
+      },
+      jwtSecret
+    );
+
+    res.json({ token: shareToken });
+  } catch (error) {
+    if (error.name === "JsonWebTokenError") {
+      res.sendStatus(401); // 401 is unauthorized and should log the user out on the client
+    } else {
+      res.status(400).send({ error });
+    }
+  }
+};
+
+exports.webCard = async (req, res) => {
+  try {
+    const [bearer, token] = req.headers.authorization.split(" ");
+
+    const { userId, cardId } = jwt.verify(token, jwtSecret);
 
     const user = await User.findById(userId);
     const card = user.cards.find((c) => c._id.equals(cardId));
@@ -68,18 +96,17 @@ exports.webCard = async (req, res) => {
 };
 
 exports.webFeed = async (req, res) => {
-  // TODO: Add feed to card from web using userId, cardId, name, and message
   try {
-    const { userId, cardId, name, message } = req.query;
+    const [bearer, token] = req.headers.authorization.split(" ");
+
+    const { userId, cardId } = jwt.verify(token, jwtSecret);
+    const { name, message } = req.body;
 
     const user = await User.findById(userId);
     const card = user.cards.find((c) => c._id.equals(cardId));
 
-    // TODO: add a new message object to the feed array with a timestamp and return the entire feed
-
     const timestamp = new Date().getTime();
 
-    // Does this actually work?
     await card.feed.push({
       timestamp,
       name,
@@ -87,7 +114,7 @@ exports.webFeed = async (req, res) => {
     });
     await user.save();
 
-    const updatedCard = user.cards.find((c) => c._id.equals(cardId)); // Needed?
+    const updatedCard = user.cards.find((c) => c._id.equals(cardId));
     const feed = updatedCard.feed;
 
     res.json({ feed });

@@ -11,7 +11,6 @@ const userModel = mongoose.Schema({
   cards: [
     {
       title: String,
-      address: String,
       location: {
         address: String,
         latitude: Number,
