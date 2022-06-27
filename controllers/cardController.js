@@ -102,6 +102,10 @@ exports.webFeed = async (req, res) => {
     const { userId, cardId } = jwt.verify(token, jwtSecret);
     const { name, message } = req.body;
 
+    if (!message) {
+      return res.status(400).send({ error: "Message is required" });
+    }
+
     const user = await User.findById(userId);
     const card = user.cards.find((c) => c._id.equals(cardId));
 
@@ -109,7 +113,7 @@ exports.webFeed = async (req, res) => {
 
     await card.feed.push({
       timestamp,
-      name,
+      name: name || "Anonymous",
       message,
     });
     await user.save();
