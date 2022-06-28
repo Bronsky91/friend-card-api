@@ -34,3 +34,28 @@ exports.new = async (req, res) => {
     throw error;
   }
 };
+
+exports.login = async (req, res) => {
+  // TODO: Implement Twilio integration
+  try {
+    const { number } = req.body;
+
+    // https://mongoosejs.com/docs/tutorials/lean.html
+    const user = await User.findOne({ number }).lean();
+    if (!user) {
+      return res.status(400).send({ error: "The phone number does not exist" });
+    }
+
+    const token = jwt.sign(
+      {
+        id: user._id,
+        number: user.number,
+      },
+      jwtSecret
+    );
+
+    return res.json({ token, user });
+  } catch (error) {
+    return res.status(500).send({ message: error });
+  }
+};
