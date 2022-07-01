@@ -6,8 +6,8 @@ const userModel = mongoose.Schema({
   name: { type: String },
   email: { type: String },
   about: { type: String },
-  //   accounts: [],
-  //   photos: [],
+  accounts: [String],
+  photos: [String],
   cards: [
     {
       title: String,
