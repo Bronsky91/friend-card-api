@@ -18,6 +18,10 @@ exports.generateCode = async (req, res) => {
       user.number = number;
     }
 
+    if (process.env.DEV) {
+      res.json({ user });
+    }
+
     const rng = seedrandom(crypto.randomBytes(64).toString("base64"), {
       entropy: true,
     });
