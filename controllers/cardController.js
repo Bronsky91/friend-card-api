@@ -6,6 +6,8 @@ const User = require("../models/userModel");
 
 const jwtSecret = process.env.JWT_SECRET;
 
+const TEST_IMAGE = `https://media-exp1.licdn.com/dms/image/C5603AQFAlhYbbU6Deg/profile-displayphoto-shrink_200_200/0/1623190408090?e=2147483647&v=beta&t=D34_RLLDyIxYssFQRy4lPRQT5XYeJ4Ftk9QwBZtwVVI`;
+
 exports.index = async (req, res) => {
   try {
     const [bearer, token] = req.headers.authorization.split(" ");
@@ -89,7 +91,7 @@ exports.webCard = async (req, res) => {
     const user = await User.findById(userId);
     const card = user.cards.find((c) => c._id.equals(cardId));
 
-    res.json({ card, profile: { name: user.name } });
+    res.json({ card, profile: { name: user.name, image: TEST_IMAGE } });
   } catch (error) {
     res.status(400).send({ error });
   }
