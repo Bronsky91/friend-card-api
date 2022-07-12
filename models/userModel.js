@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const userModel = mongoose.Schema({
-  number: { type: Number, required: true, unique: true },
+  number: { type: String, required: true, unique: true },
   authCode: { type: Number },
   name: { type: String },
   email: { type: String },

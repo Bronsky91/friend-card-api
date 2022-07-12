@@ -3,6 +3,10 @@ const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const seedrandom = require("seedrandom");
 
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const twilioClient = require("twilio")(accountSid, authToken);
+
 const User = require("../models/userModel");
 
 const jwtSecret = process.env.JWT_SECRET;
@@ -28,14 +32,13 @@ exports.generateCode = async (req, res) => {
 
     await user.save();
 
-    if (process.env.DEV) {
-      return res.json({ code });
-    }
+    twilioClient.messages.create({
+      body: `Your Friend Card code is: ${code}`,
+      from: "+12185209222",
+      to: number,
+    });
 
-    // TODO: Implement Twilio integration
-    //* Send code to phone number entered
-
-    return res.sendStatus(200);
+    return res.json({ code });
   } catch (error) {
     return res.status(500).send({ message: error });
   }
@@ -45,7 +48,7 @@ exports.validateCode = async (req, res) => {
   try {
     const { code } = req.body;
 
-    // TODO: Retrieve user from code, if user found logged in, otherwise send 401
+    // Retrieve user from code, if user found logged in, otherwise send 401
     const user = await User.findOne({ authCode: code });
 
     if (!user) {
