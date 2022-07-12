@@ -9,17 +9,14 @@ const jwtSecret = process.env.JWT_SECRET;
 
 exports.generateCode = async (req, res) => {
   try {
-    const { number } = req.body;
+    const { number, name } = req.body;
 
     // Find or create user
     let user = await User.findOne({ number });
     if (!user) {
       user = new User();
       user.number = number;
-    }
-
-    if (process.env.DEV) {
-      res.json({ user });
+      user.name = name;
     }
 
     const rng = seedrandom(crypto.randomBytes(64).toString("base64"), {
@@ -27,9 +24,13 @@ exports.generateCode = async (req, res) => {
     });
     const code = rng().toString().substring(3, 7);
 
-    console.log(`AUTH CODE FOR DEBUGGING`, code);
-
     user.authCode = code;
+
+    await user.save();
+
+    if (process.env.DEV) {
+      return res.json({ code });
+    }
 
     // TODO: Implement Twilio integration
     //* Send code to phone number entered
@@ -60,9 +61,8 @@ exports.validateCode = async (req, res) => {
     );
 
     delete user.authCode;
-    user.token = token;
 
-    return res.json({ user });
+    return res.json({ user, token });
   } catch (error) {
     return res.status(500).send({ message: error });
   }
