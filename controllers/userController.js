@@ -34,7 +34,7 @@ exports.generateCode = async (req, res) => {
 
     twilioClient.messages.create({
       body: `Your Friend Card code is: ${code}`,
-      from: "+12185209222",
+      from: "+14155733922",
       to: number,
     });
 
