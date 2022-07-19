@@ -41,5 +41,5 @@ app.use(bodyParser.json());
 app.use("/api", routes);
 
 app.listen(port, () => {
-  console.log(`Show list API listening on port ${port}`);
+  console.log(`Friend Card API listening on port ${port}`);
 });

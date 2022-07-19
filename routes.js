@@ -8,6 +8,7 @@ router.route("/user/code").post(userController.generateCode);
 router.route("/user/validate").post(userController.validateCode);
 
 router.route("/card").get(cardController.index).post(cardController.add);
+router.route("/card/feed").post(cardController.feed);
 
 router
   .route("/web/card")
