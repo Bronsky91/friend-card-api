@@ -230,12 +230,12 @@ exports.webFeed = async (req, res) => {
 
     const timestamp = new Date().getTime();
 
-    // await card.feed.push({
-    //   timestamp,
-    //   name: name || "Anonymous",
-    //   message,
-    // });
-    // await user.save();
+    await card.feed.push({
+      timestamp,
+      name: name || "Anonymous",
+      message,
+    });
+    await user.save();
 
     const updatedCard = user.cards.find((c) => c._id.equals(cardId));
     const feed = updatedCard.feed;
